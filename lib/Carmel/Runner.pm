@@ -2,8 +2,6 @@ package Carmel::Runner;
 use strict;
 use warnings;
 
-our $UseSystem = 0;
-
 sub new {
     my $class = shift;
 
@@ -41,17 +39,22 @@ sub env {
 }
 
 sub execute {
-    my($self, @args) = @_;
+    my($self, @cmd) = @_;
 
-    shift @args if $args[0] && $args[0] eq '--';
+    shift @cmd if $cmd[0] && $cmd[0] eq '--';
 
     %ENV = (%ENV, $self->env);
-    if ($UseSystem) {
-        system @args;
-    } else {
-        exec @args;
-        exit 127; # command not found
-    }
+    exec @cmd;
+    exit 127; # command not found
+}
+
+sub run {
+    my($self, @cmd) = @_;
+
+    shift @cmd if $cmd[0] && $cmd[0] eq '--';
+
+    local %ENV = (%ENV, $self->env);
+    system @cmd;
 }
 
 sub _join {

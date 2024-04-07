@@ -15,8 +15,9 @@ use Carmel::App;
 use Capture::Tiny qw(capture);
 use File::pushd ();
 use Path::Tiny;
+use Test::More;
 
-$Carmel::Runner::UseSystem = 1;
+our $DEV = Path::Tiny->new(".")->absolute;
 
 use Class::Tiny qw( dir stdout stderr exit_code clean );
 
@@ -59,7 +60,36 @@ sub repo {
     local $ENV{PERL_CARMEL_REPO} = $self->dir->child(".carmel")
       if $self->{clean};
 
-    Carmel::App->new->build_repo;
+    Carmel::Environment->new->repo;
+}
+
+sub cmd_in_dir {
+    my($self, $dir, @args) = @_;
+    local $self->{dir} = $self->dir->child($dir);
+    $self->run(@args);
+}
+
+sub cmd {
+    my($self, @args) = @_;
+
+    my $pushd = File::pushd::pushd $self->dir;
+    my @capture = capture {
+        my $code = system @args;
+        $self->exit_code($code);
+    };
+
+    $self->stdout($capture[0]);
+    $self->stderr($capture[1]);
+}
+
+sub cmd_ok {
+    my($self, @args) = @_;
+
+    $self->cmd(@args);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is $self->exit_code, 0, "carmel @args succeeded"
+      or diag $self->stderr;
 }
 
 sub run_in_dir {
@@ -76,12 +106,43 @@ sub run {
       if $self->{clean};
 
     my @capture = capture {
-        my $code = eval { Carmel::App->new->run(@args) };
+        my $code = $self->run_cli(@args);
         $self->exit_code($@ ? 255 : $code);
+        warn $@ if $@;
     };
 
     $self->stdout($capture[0]);
     $self->stderr($capture[1]);
+}
+
+sub run_cli {
+    my($self, @cmd) = @_;
+
+    if ($cmd[0] eq "exec") {
+        system $^X, "-I$DEV/lib", "$DEV/script/carmel", @cmd;
+    } else {
+        eval { Carmel::App->new->run(@cmd) };
+    }
+}
+
+sub run_ok {
+    my($self, @args) = @_;
+
+    $self->run(@args);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is $self->exit_code, 0, "carmel @args succeeded"
+      or diag $self->stderr;
+}
+
+sub run_fails {
+    my($self, @args) = @_;
+
+    $self->run(@args);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    isnt $self->exit_code, 0, "carmel @args failed"
+      or diag $self->stderr;
 }
 
 sub run_any {

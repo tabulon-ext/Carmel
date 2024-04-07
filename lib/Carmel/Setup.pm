@@ -10,15 +10,6 @@ sub has_local {
 
 sub environment { $environment }
 
-sub bin_path {
-    my($class, $module, $bin) = @_;
-
-    my $exec = $environment->{execs}{$module}{$bin};
-    return $exec if $exec && -f $exec && -r _ && -x _;
-
-    die "Can't find executable '$bin' in '$module': $!";
-}
-
 sub load {
     # TODO look for cpanfile?
     $path = $ENV{PERL_CARMEL_PATH} || '.';
@@ -29,11 +20,15 @@ sub load {
         eval {
             require "$path/.carmel/MySetup.pm";
         };
-        if ($@ && $@ =~ /Can't locate .*\.carmel\/MySetup\.pm/) {
-            $err = "Can't locate .carmel/MySetup.pm in '$path'. You need to run `carmel install` first.\n";
+        if ($@) {
+            if ($@ =~ /Can't locate .*\.carmel\/MySetup\.pm/) {
+                $err = "Can't locate .carmel/MySetup.pm in '$path'. You need to run `carmel install` first.\n";
+            } else {
+                $err = $@;
+            }
         }
     }
-    
+
     die $err if $err;
 
     $environment = \%Carmel::MySetup::environment;

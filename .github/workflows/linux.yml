@@ -7,9 +7,9 @@ jobs:
   perl:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         perl-version:
-          - '5.12'
           - '5.14'
           - '5.16'
           - '5.18'
@@ -19,11 +19,12 @@ jobs:
           - '5.26'
           - '5.28'
           - '5.30'
-        test-clean: ['', 1]
+          - '5.32'
+          - '5.34'
     container:
       image: perl:${{ matrix.perl-version }}
       env:
-        TEST_CLEAN: ${{ matrix.test-clean }}
+        TEST_CLEAN: 1
     steps:
       - uses: actions/checkout@v1
       - name: perl -V
@@ -31,7 +32,7 @@ jobs:
       - name: Install Dependencies
         run: |
           curl -sL https://cpanmin.us/ | perl - App::cpanminus && \
-          cpanm -nq --dev Menlo && \
+          cpanm -nq --dev Menlo Carton && \
           cpanm -nq --with-develop --installdeps .
       - name: Run Tests
-        run: prove -lr xt
+        run: prove --timer -j10 -lr xt

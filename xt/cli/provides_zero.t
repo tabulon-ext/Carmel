@@ -10,7 +10,7 @@ subtest 'carmel install picks up the right version' => sub {
 requires 'CPAN::Test::Dummy::Perl5::VersionBump', '== 0.01';
 EOF
 
-    $app->run("install");
+    $app->run_ok("install");
 
     # blow away the artifact
     my $artifact = $app->repo->find_match(
@@ -24,16 +24,11 @@ EOF
 requires 'CPAN::Test::Dummy::Perl5::VersionBump::Undef';
 EOF
 
-    $app->run("install");
+    $app->run_ok("install");
 
     unlike $app->stderr, qr/Can't find an artifact for CPAN::Test::Dummy::Perl5::VersionBump::Undef/;
-
- TODO: {
-        local $TODO = "Can't pass distfile to cpanm. dist 0.01 cannot be retrieved via submodule";
-
-        is( ($app->snapshot->distributions)[0]->name, "CPAN-Test-Dummy-Perl5-VersionBump-0.01",
-            "snapshot version is restored" );
-    }
+    is( ($app->snapshot->distributions)[0]->name, "CPAN-Test-Dummy-Perl5-VersionBump-0.01",
+        "snapshot version is restored" );
 };
 
 done_testing;

@@ -2,6 +2,101 @@ Revision history for Carmel
 
 {{$NEXT}}
 
+v0.9.2  2022-05-27 00:31:06 PDT
+    [IMPROVEMENTS]
+        - carmel update is now much faster, especially when a custom mirror is used (#58)
+        - uses git diff internally for git coloring rather than janky regexes (#87)
+        - internal refactoring
+
+v0.9.1  2022-05-20 14:55:34 PDT
+    [IMPROVEMENTS]
+        - Added a file-based lock during install/update run to avoid corrupted artifacts (#41, #79)
+        - Improved error message for running under -T (#76)
+
+v0.9.0  2022-05-14 15:59:45 PDT
+    [NEW FEATURES]
+        - Added carmel reinstall to rebuild build artifacts for all the dependencies (#59, #68)
+        - Added carmel info as an alias for show
+        - Added carmel look to open a new shell inside the build artifact directory, like cpanm --look
+        - Added carmel run, like carmel exec but uses system() instead of exec() (#20)
+    [BUG FIXES]
+        - Ignore core modules that are not dual life e.g. strict.pm (#69)
+    [IMPROVEMENTS]
+        - carmel update won't downgrade if you have a higher version than what's on CPAN (#66)
+        - carmel update progress bar will show the actual number of dists, rather than percentage
+        - Uses https mirror (https://cpan.metacpan.org/) by default (#42)
+        - Remove existing artifacts before importing, for clean install (#70)
+        - carmel inject now works without cpanfile, outside a project directory (#73)
+        - Documentation updates
+
+v0.1.56  2022-05-11 12:40:21 PDT
+        - carmel install without the snapshot will install the latest versions (#53)
+
+v0.1.55  2022-05-11 00:20:03 PDT
+        - carmel update now updates core modules specified in cpanfile (#48)
+        - Fix a bug where carmel update fails with division by zero when there's no dist in snapshot
+
+v0.1.54  2022-05-10 21:54:59 PDT
+        - Add a simple progress bar to carmel update (#56)
+
+v0.1.53  2022-05-10 02:16:50 PDT
+        - Added new command carmel diff to nicely format cpanfile.snapshot diff (#54)
+
+v0.1.52  2022-05-09 12:51:21 PDT
+        - Fix a bug where carmel update fails when custom mirror is specified in cpanfile (#52)
+
+v0.1.51  2022-05-09 09:59:21 PDT
+        - Unified carmel update/pin and deprecated the pin command.
+        - carmel update now runs much faster if you already have the build artifacts for the new version.
+        - Improved the error message when carmel update conflicts with what's in cpanfile
+        - Work around a corner case where carmel update fails with bad NAME in MYMETA e.g. LWP (#51)
+
+v0.1.50  2022-05-09 00:23:17 PDT
+        - Fixed a bug where core modules in the snapshot can be ignored in the fist carmel install (#47)
+        - Carmel now automatically upgrades core modules specified in the snapshot if the version is
+          lower than what's in core, and cpanfile doesn't have any specific requirement. (#49)
+        - Speed up carmel install when all the required versions are in the artifacts
+
+v0.1.49  2022-05-08 11:47:37 PDT
+        - Speed up the artifacts search and snapshot generation with lazy-loading and JSON backend
+
+v0.1.48  2022-05-08 02:44:56 PDT
+        - Huge performance improvements for carmel update to avoid installation when there's no updates (#44)
+
+v0.1.47  2022-05-07 22:12:42 PDT
+        - Fix carmel package to not fetch from CPAN when cache is empty
+        - Internal refactoring of the code base
+
+v0.1.46  2022-05-07 14:10:39 PDT
+        - New command: carmel pin to pin a module version in the snapshot without pinning it in cpanfile (#39)
+        - Improve error message when a conflict is found
+        - Fix a bug where a distribution can appear multiple times when downgrading a distribution (#38)
+        - Make artifacts search always strict after install is done
+        - Improved documentation
+
+v0.1.45  2022-05-07 01:36:08 PDT
+        - Cleanup perl5 temporary library path to avoid missing artifacts when previous
+          installation was cancelled
+        - Add sort to stablize carmel env/export command outputs
+
+v0.1.44  2022-05-06 20:39:25 PDT
+        - Fix a bug where Module::Build::Tiny is not installed on the first run (#34)
+
+v0.1.43  2022-05-06 19:17:34 PDT
+        - Dropped support for perl 5.12
+        - Removed the experimental, undocumented binstubs command
+        - Fixed so carmel command exits with non-zero upon failures
+        - Fixed `carmel show Module` to work with sub-modules in a distribution
+
+v0.1.42  2022-05-06 17:02:09 PDT
+        - Documentation updates
+
+v0.1.41  2022-05-06 14:35:01 PDT
+        - Add support for carmel update Module
+
+v0.1.40  2022-05-06 01:51:17 PDT
+        - Remove the unnecessary pinning of versions restored from the snapshot (#33)
+
 v0.1.39  2022-02-12 21:20:22 PST
         - updated docs
 
